@@ -1,0 +1,35 @@
+FROM quay.io/redhat-services-prod/openshift/boilerplate:image-v8.4.1 as builder
+
+WORKDIR /workspace
+
+COPY yet-another-cloudwatch-exporter .
+
+ENV GOFLAGS='-mod=mod'
+ENV CGO_ENABLED=0
+
+ARG TARGETOS TARGETARCH
+RUN curl -sL -o promu.tar.gz https://github.com/prometheus/promu/releases/download/v0.17.0/promu-0.17.0.${TARGETOS}-${TARGETARCH}.tar.gz \
+&& tar -xzf promu.tar.gz -C /usr/local/bin \
+&& rm promu.tar.gz \
+&& /usr/local/bin/promu-0.17.0.${TARGETOS}-${TARGETARCH}/promu -v build --prefix /go/bin/
+
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+WORKDIR /
+
+COPY --from=builder /go/bin/yace /bin/yace
+COPY --from=builder /workspace/LICENSE /licenses/LICENSE
+
+USER nobody
+ENTRYPOINT [ "/bin/yace" ]
+CMD [ "--config.file=/etc/yace/config.yml" ]
+
+ARG VERSION
+
+LABEL vendor="Red Hat, Inc." \
+  com.redhat.component="rhobs-yace" \
+  name="yace" \
+  maintainer="team-monitoring@redhat.com" \
+  version="$VERSION" \
+  release="$VERSION" \
+  description="YACE (Yet Another CloudWatch Exporter) exports AWS CloudWatch metrics as Prometheus metrics." \
+  summary="AWS CloudWatch metrics exporter for Prometheus"

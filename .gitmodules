@@ -1,0 +1,4 @@
+[submodule "yet-another-cloudwatch-exporter"]
+	path = yet-another-cloudwatch-exporter
+	url = https://github.com/nerdswords/yet-another-cloudwatch-exporter
+	branch = master
