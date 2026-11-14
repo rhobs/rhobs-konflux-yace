@@ -2,7 +2,7 @@
 
 Konflux midstream build for [YACE (Yet Another CloudWatch Exporter)](https://github.com/nerdswords/yet-another-cloudwatch-exporter).
 
-Builds YACE from upstream source on UBI 9 minimal base image, providing SBOM, SLSA attestation, and vulnerability scanning for deployment on ROSA HCP Management Clusters.
+Builds YACE from upstream source using Red Hat HI Go FIPS builder and runtime images, providing SBOM, SLSA attestation, and vulnerability scanning for deployment on ROSA HCP Management Clusters.
 
 ## Update submodule
 
