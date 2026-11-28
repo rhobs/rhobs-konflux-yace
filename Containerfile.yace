@@ -1,4 +1,8 @@
-FROM quay.io/redhat-services-prod/openshift/boilerplate:image-v8.4.1 as builder
+FROM registry.access.redhat.com/hi/go:latest-fips-builder@sha256:44b74e7349b73b68f30a17dcdc52842f14ff3fa1293827a408d8d051049ec08d as builder
+
+USER root
+
+RUN dnf install -y tar gzip && dnf clean all
 
 WORKDIR /workspace
 
@@ -13,13 +17,13 @@ RUN curl -sL -o promu.tar.gz https://github.com/prometheus/promu/releases/downlo
 && rm promu.tar.gz \
 && /usr/local/bin/promu-0.17.0.${TARGETOS}-${TARGETARCH}/promu -v build --prefix /go/bin/
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+FROM registry.access.redhat.com/hi/go:latest-fips@sha256:b793b36bc6129d842d28f051681deb7907aae8b9b40e894fcd62e0fb2c1eaad5
 WORKDIR /
 
 COPY --from=builder /go/bin/yace /bin/yace
 COPY --from=builder /workspace/LICENSE /licenses/LICENSE
 
-USER nobody
+USER 65532:65532
 ENTRYPOINT [ "/bin/yace" ]
 CMD [ "--config.file=/etc/yace/config.yml" ]
 
